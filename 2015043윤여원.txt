@@ -1,0 +1,96 @@
+install.packages("ggplot2")
+
+
+library(ggplot2)
+
+setwd("F:/backup/backup160609")
+catalogCrossSell <- read.csv("F:/backup/backup160609/catalogCrossSell.csv", header = T)
+catalogCrossSell2 <- read.delim('F:/backup/backup160609/catalogCrossSell.csv', stringsAsFactors = FALSE)  
+
+catalogCrossSell
+
+View(catalogCrossSell)
+head(catalogCrossSell)
+
+str(catalogCrossSell)
+summary(catalogCrossSell)
+
+# CID 는 제외함
+km <- kmeans(subset(catalogCrossSell, select=-c(CID)), centers = 3)
+
+str(km)
+
+head(km)
+
+#CID 제외하고 봤더니 헬스에서 1이 주~욱 나와서 가치가 없어서 제외
+
+km <- kmeans(subset(catalogCrossSell, select=-c(CID, Health)), centers = 3)
+
+str(km)
+
+km
+
+# 2개 제외한 다음 군집화 시켜봄
+
+noid <- subset(catalogCrossSell, select = -c(CID, Health))
+cov(noid)
+
+dj <- dist(noid)
+plot(cc <-hclust(dj), main = "test")
+cc
+# 군집화 시키고 봤더니 4개의 군집이 알맞을 듯 
+
+rge <- sapply(noid, function(x) diff(range(x)))
+cata_s <- sweep(noid, 2, rge, FUN ="/")
+round( sapply(cata_s, var), digit=5)
+kmeans(cata_s, centers = 2)$centers *rge
+n <- nrow(cata_s)
+wss <- rep(0,7)
+wss[1] <- (n-1)*sum(sapply(cata_s, var))
+for (i in 2:7)
+  wss[i] <- sum(kmeans(cata_s,
+                       centers = i) $withoness)
+plot(1:7, wss, type = "b")
+
+install.packages("kohonen")
+library(kohonen)
+
+cata2 <- read.csv("F:/backup/backup160609/catalogCrossSell.csv", stringsAsFactors=FALSE)
+cata2.n <-scale(subset(cata2, select=-c(CID, Health)))
+set.seed(1)
+
+
+sm<-som(data = cata2.n, grid = somgrid(2, 2, "rectangular"))
+str(sm)
+plot(sm, main = "SOM analytics")
+
+cata2$clusterX <- sm$grid$pts[sm$unit.classif, "x"]
+cata2$clusterY <- sm$grid$pts[sm$unit.classif, "y"]
+p <- ggplot(cata2, aes(clusterX, clusterY))
+p + geom_jitter(position = position_jitter(width=.5, height = .5))
+
+
+install.packages("NbClust")
+library(NbClust)
+
+#nc <- NbClust(data = noid, min.nc=2, max.nc=15, method="kmeans", index = "all")
+
+nc <- NbClust(noid, distance = "euclidean", min.nc=2, max.nc=8, method = "complete", index = "ch")
+head(nc)
+
+# 이걸로 해보면 최적의 클러스터는 6이라 나옴
+par(mfrow=c(1,1))
+barplot(table(nc$Best.n[6,]),
+        xlab="Numer of Clusters", ylab="Number of Criteria",
+        main="Number of Clusters Chosen")
+
+
+cata2$cluster <- as.factor(km$cluster)
+qplot(Housewares, Garden, colour=cluster, data=cata2)
+plot(subset(cata2, select=-c(CID, Health, cluster)), col=km$cluster)
+qplot(Housewares, colour=cluster, data = cata2, geom = "density")
+
+install.packages("cluster")
+library(cluster)
+
+clusplot(subset(cata2, select=-c(CID, Health)), km$cluster)
