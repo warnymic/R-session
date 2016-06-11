@@ -15,14 +15,14 @@ head(catalogCrossSell)
 str(catalogCrossSell)
 summary(catalogCrossSell)
 
-# CID ´Â Á¦¿ÜÇÔ
+# CID ëŠ” ì œì™¸í•¨
 km <- kmeans(subset(catalogCrossSell, select=-c(CID)), centers = 3)
 
 str(km)
 
 head(km)
 
-#CID Á¦¿ÜÇÏ°í ºÃ´õ´Ï Çï½º¿¡¼­ 1ÀÌ ÁÖ~¿í ³ª¿Í¼­ °¡Ä¡°¡ ¾ø¾î¼­ Á¦¿Ü
+#CID ì œì™¸í•˜ê³  ë´¤ë”ë‹ˆ í—¬ìŠ¤ì—ì„œ 1ì´ ì£¼~ìš± ë‚˜ì™€ì„œ ê°€ì¹˜ê°€ ì—†ì–´ì„œ ì œì™¸
 
 km <- kmeans(subset(catalogCrossSell, select=-c(CID, Health)), centers = 3)
 
@@ -30,7 +30,7 @@ str(km)
 
 km
 
-# 2°³ Á¦¿ÜÇÑ ´ÙÀ½ ±ºÁýÈ­ ½ÃÄÑº½
+# 2ê°œ ì œì™¸í•œ ë‹¤ìŒ êµ°ì§‘í™” ì‹œì¼œë´„
 
 noid <- subset(catalogCrossSell, select = -c(CID, Health))
 cov(noid)
@@ -38,7 +38,7 @@ cov(noid)
 dj <- dist(noid)
 plot(cc <-hclust(dj), main = "test")
 cc
-# ±ºÁýÈ­ ½ÃÅ°°í ºÃ´õ´Ï 4°³ÀÇ ±ºÁýÀÌ ¾Ë¸ÂÀ» µí 
+# êµ°ì§‘í™” ì‹œí‚¤ê³  ë´¤ë”ë‹ˆ 4ê°œì˜ êµ°ì§‘ì´ ì•Œë§žì„ ë“¯ 
 
 rge <- sapply(noid, function(x) diff(range(x)))
 cata_s <- sweep(noid, 2, rge, FUN ="/")
@@ -78,7 +78,7 @@ library(NbClust)
 nc <- NbClust(noid, distance = "euclidean", min.nc=2, max.nc=8, method = "complete", index = "ch")
 head(nc)
 
-# ÀÌ°É·Î ÇØº¸¸é ÃÖÀûÀÇ Å¬·¯½ºÅÍ´Â 6ÀÌ¶ó ³ª¿È
+# ì´ê±¸ë¡œ í•´ë³´ë©´ ìµœì ì˜ í´ëŸ¬ìŠ¤í„°ëŠ” 6ì´ë¼ ë‚˜ì˜´
 par(mfrow=c(1,1))
 barplot(table(nc$Best.n[6,]),
         xlab="Numer of Clusters", ylab="Number of Criteria",
